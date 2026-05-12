@@ -1,0 +1,17 @@
+# Dependency
+node_modules/
+dist/
+build/
+package-lock.json
+
+# Docker
+.data/
+db_data/
+tmp/
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
