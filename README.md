@@ -2,7 +2,6 @@
 
 > Full-stack modernization of a 2016 Laravel + AngularJS bachelor thesis into a production-ready Go + React + TypeScript application.
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Go](https://img.shields.io/badge/go-1.26-00ADD8?logo=go)](https://go.dev/)
 [![React](https://img.shields.io/badge/react-19-61DAFB?logo=react)](https://react.dev/)
 [![Docker](https://img.shields.io/badge/docker-compose-2496ED?logo=docker)](https://docs.docker.com/compose/)
@@ -97,7 +96,9 @@ tutor-app/
 
 ## 📜 License
 
-MIT License — see [`LICENSE`](LICENSE) for details.
+Copyright (c) 2026 Kevin Fidelis. All rights reserved.
+
+This source code is provided for viewing and reference purposes only. Unauthorized use, modification, distribution, or commercial exploitation is strictly prohibited without prior written permission.
 
 ---
 
