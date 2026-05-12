@@ -57,7 +57,7 @@ tutor-app/
 │   ├── handlers/            # API handlers (REST)
 │   ├── models/              # Domain models
 │   └── migrations/          # 22-table PostgreSQL schema
-└── frontend/
+├── frontend/
 │   ├── Dockerfile           # Vite dev server
 │   ├── src/
 │   │   ├── main.tsx         # React entry point
