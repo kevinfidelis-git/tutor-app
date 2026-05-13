@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppNavbar from '../components/Navbar';
@@ -9,31 +9,49 @@ const API_URL = 'http://localhost:8080/api';
 function LandingPage() {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     
     try {
-      const response = await axios.post(`${API_URL}/login`, credentials);
-      const token = response.data.token;
-      
-      // Store token with expiry
-      const expiryTime = Date.now() + (360 * 60 * 1000); // 6 hours
-      localStorage.setItem('tps', JSON.stringify({ token, expiry: expiryTime }));
-      
-      // Check role and redirect
+      // Step 1: Login → get JWT token
+      const loginRes = await axios.post(`${API_URL}/login`, {
+        username: credentials.username,
+        password: credentials.password,
+      });
+
+      const token = loginRes.data.token;
+
+      // Step 2: Store token (with expiry)
+      const hours = 6;
+      const expiry = Date.now() + (hours * 60 * 60 * 1000);
+      localStorage.setItem('tps', JSON.stringify({ token, expiry }));
+
+      // Step 3: Check role
       const roleRes = await axios.get(`${API_URL}/login?token=${token}`);
-      const role = roleRes.data;
-      
+      const role = roleRes.data.role;
+
+      // Step 4: Redirect based on role
       if (role === 'admin') navigate('/admin');
       else if (role === 'astor') navigate('/astor');
       else if (role === 'maba') navigate('/maba');
-      else setError('Tidak ada mahasiswa dalam database!');
+      else setError('No student data found in the database!');
       
-    } catch (err) {
-      setError('Maaf, data login tidak benar. Silahkan diperiksa kembali.');
+    } catch (err: any) {
+      if (err.response) {
+        const goError = err.response.data?.error || 'Terjadi kesalahan server';
+        setError(goError);
+      } else if (err.request) {
+        setError('Can\'t connect to server. Please check your connection.');
+      } else {
+        setError('Error occured. Please try again later.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,8 +96,13 @@ function LandingPage() {
                         required
                       />
                     </Form.Group>
-                    <Button variant="primary" type="submit" className="w-100">
-                      Login
+                    <Button 
+                      variant="primary" 
+                      type="submit" 
+                      className="w-100"
+                      disabled={loading}
+                    >
+                      {loading ? 'Loading...' : 'Login'}
                     </Button>
                   </Form>
                 </Card.Body>

@@ -39,6 +39,7 @@ services:
       - DB_PASSWORD=tutor_pass
       - DB_NAME=tutor_db
       - REDIS_ADDR=redis:6379
+      - JWT_SECRET=tutor-app
     depends_on:
       postgres:
         condition: service_healthy

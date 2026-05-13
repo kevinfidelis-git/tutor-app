@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"tutor-backend/handlers"
 	"tutor-backend/routes"
@@ -40,15 +41,22 @@ func main() {
 	})
 	fmt.Println("Redis client initialized")
 
+	// JWT Secret from env (or default for dev)
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		jwtSecret = "your-dev-secret-change-in-production"
+	}
+
 	// Setup Gin
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
 	}))
 
 	r.GET("/health", func(c *gin.Context) {
@@ -61,9 +69,11 @@ func main() {
 
 	// Initialize handlers
 	guestHandler := handlers.NewGuestHandler(db)
+	authHandler := handlers.NewAuthHandler(db, rdb, jwtSecret)
 
 	// Register routes
 	routes.RegisterGuestRoutes(r, guestHandler)
+	routes.RegisterAuthRoutes(r, authHandler)
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Tutor API is running!"})
