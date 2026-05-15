@@ -43,12 +43,12 @@ function LandingPage() {
       
     } catch (err: any) {
       if (err.response) {
-        const goError = err.response.data?.error || 'Terjadi kesalahan server';
+        const goError = err.response.data?.error || 'Error has occured.';
         setError(goError);
       } else if (err.request) {
         setError('Can\'t connect to server. Please check your connection.');
       } else {
-        setError('Error occured. Please try again later.');
+        setError('Error has occured. Please try again later.');
       }
     } finally {
       setLoading(false);

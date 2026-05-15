@@ -70,10 +70,14 @@ func main() {
 	// Initialize handlers
 	guestHandler := handlers.NewGuestHandler(db)
 	authHandler := handlers.NewAuthHandler(db, rdb, jwtSecret)
+	prodiHandler := handlers.NewProdiHandler(db)
+	pengumumanHandler := handlers.NewPengumumanHandler(db)
 
 	// Register routes
 	routes.RegisterGuestRoutes(r, guestHandler)
 	routes.RegisterAuthRoutes(r, authHandler)
+	routes.RegisterProdiRoutes(r, prodiHandler)
+	routes.RegisterPengumumanRoutes(r, pengumumanHandler)
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Tutor API is running!"})

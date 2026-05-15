@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"net/http"
+	"strconv"
 	"time"
 
 	"tutor-backend/models"
@@ -20,12 +21,6 @@ func NewGuestHandler(db *sql.DB) *GuestHandler {
 
 // GET /api/tamu — list all guests
 func (h *GuestHandler) Index(c *gin.Context) {
-	id := c.Query("id")
-
-	if id != "" {
-		h.Show(c, id)
-		return
-	}
 
 	rows, err := h.DB.Query(`
 		SELECT id_tamu, waktu_tamu, nama_tamu, email_tamu, catatan_tamu 
@@ -52,9 +47,15 @@ func (h *GuestHandler) Index(c *gin.Context) {
 }
 
 // GET /api/tamu/:id — single guest
-func (h *GuestHandler) Show(c *gin.Context, id string) {
+func (h *GuestHandler) Show(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID not valid"})
+		return
+	}
+
 	var g models.Guest
-	err := h.DB.QueryRow(`
+	err = h.DB.QueryRow(`
 		SELECT id_tamu, waktu_tamu, nama_tamu, email_tamu, catatan_tamu 
 		FROM buku_tamu 
 		WHERE id_tamu = $1
@@ -99,4 +100,21 @@ func (h *GuestHandler) Store(c *gin.Context) {
 		"id_tamu":    id,
 		"waktu_tamu": waktu,
 	})
+}
+
+// DELETE /api/tamu/:id — delete guest
+func (h *GuestHandler) Delete(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID not valid"})
+		return
+	}
+
+	_, err = h.DB.Exec("DELETE FROM buku_tamu WHERE id_tamu = $1", id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to delete data"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Data deleted successfully"})
 }
